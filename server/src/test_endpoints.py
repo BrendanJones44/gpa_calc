@@ -1,4 +1,4 @@
-from app import app, db
+from gpa_calc import *
 from flask import url_for
 import unittest
 
