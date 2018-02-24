@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, jsonify
 import gspread
+from flask import Flask, render_template, request, jsonify
 from oauth2client.service_account import ServiceAccountCredentials
-
 app = Flask(__name__)
 
 @app.route('/')
@@ -24,18 +23,12 @@ def create_term():
     try:
         req_data["term"]
     except:
-        if "missing parameter" in errors.keys():
-            errors["missing parameter"].append("term")
-        else:
-            errors["missing parameter"] = ["term"]
+        add_error(errors, "missing parameter", "term")
     try:
         req_data["year"]
     except:
-        if "missing parameter" in errors.keys():
-            errors["missing parameter"].append("year")
-        else:
-            errors["missing parameter"] = ["year"]
-
+        add_error(errors, "missing parameter", "year")
+        
     if len(errors) == 0:
         return "created", 201
     else:
@@ -46,7 +39,7 @@ def create_term():
                     error_msg += "missing parameters:"
                     for i in range(len(error_list)):
                         error_msg += " " + error_list[i] + ("," if (i != len(error_list) - 1) else "")
-                elif len(error_list == 1):
+                elif len(error_list) == 1:
                     error_msg += "missing parameter:" + error_list[0]
         resp_obj["message"] = error_msg
         return jsonify(resp_obj), 400
@@ -56,3 +49,16 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
 
 
+def add_error(errors, error_type, error):
+    """
+    add_error to appropriate place in errors hash
+
+    :param errors: the hash of {error_type:[error]} 's
+    :param error_type: the type of error
+    :param error: the error to add
+    :return: none. Adds error to errors
+    """
+    if error_type in errors.keys():
+        errors[error_type].append(error)
+    else:
+        errors[error_type] = [error]
