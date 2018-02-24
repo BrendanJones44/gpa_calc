@@ -15,5 +15,6 @@ class FlaskTodosTest(unittest.TestCase):
         result = self.app.get('/')
         self.assertEqual(result.status_code, 200)
 
+
 if __name__ == '__main__':
     unittest.main()
