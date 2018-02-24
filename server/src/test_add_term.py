@@ -19,7 +19,7 @@ class FlaskTodosTest(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         resp_data_as_json = json.loads(response.data.decode("utf-8"))
         self.assertEqual(resp_data_as_json["message"],
-                        "missing parameter: term.")
+                        "missing parameters: term, year")
 
     #def test_missing_
 

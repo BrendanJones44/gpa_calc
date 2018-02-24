@@ -17,16 +17,38 @@ def hello():
 @app.route('/terms/new', methods=['POST'])
 def create_term():
     req_data = request.get_json()
-    error_message = ""
+
     resp_obj = {}
+    errors = {}
+
     try:
         req_data["term"]
     except:
-        error_message +="missing parameter: term."
-    if not error_message:
+        if "missing parameter" in errors.keys():
+            errors["missing parameter"].append("term")
+        else:
+            errors["missing parameter"] = ["term"]
+    try:
+        req_data["year"]
+    except:
+        if "missing parameter" in errors.keys():
+            errors["missing parameter"].append("year")
+        else:
+            errors["missing parameter"] = ["year"]
+
+    if len(errors) == 0:
         return "created", 201
     else:
-        resp_obj["message"] = error_message
+        error_msg = ""
+        for error_type, error_list in errors.items():
+            if error_type == "missing parameter":
+                if len(error_list) > 1:
+                    error_msg += "missing parameters:"
+                    for i in range(len(error_list)):
+                        error_msg += " " + error_list[i] + ("," if (i != len(error_list) - 1) else "")
+                elif len(error_list == 1):
+                    error_msg += "missing parameter:" + error_list[0]
+        resp_obj["message"] = error_msg
         return jsonify(resp_obj), 400
 
 
