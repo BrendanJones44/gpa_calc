@@ -1,6 +1,7 @@
 import gspread
 from flask import Flask, render_template, request, jsonify
 from validations.validate_models import validate_term
+from models.term import Term
 from oauth2client.service_account import ServiceAccountCredentials
 app = Flask(__name__)
 
@@ -11,7 +12,6 @@ def hello():
     client = gspread.authorize(creds)
     classes_sheet = client.open('gpa_calc_backend').sheet1
     classes = classes_sheet.get_all_records()
-    #print(classes)
     return render_template('index.html', classes=classes)
 
 @app.route('/terms/new', methods=['POST'])
@@ -19,13 +19,14 @@ def create_term():
     req_data = request.get_json()
 
     resp_obj = {}
-    error_msg = validate_term(req_data)
+    term = Term(req_data)
 
-    if not error_msg:
-        return "created", 201
-    else:
-        resp_obj["message"] = error_msg
+
+    if term.has_errors():
+        resp_obj["message"] = term.error_msg()
         return jsonify(resp_obj), 400
+    else:
+        return "created", 201
 
 
 if __name__ == "__main__":
