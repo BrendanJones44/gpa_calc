@@ -2,9 +2,11 @@ from enum import Enum
 
 class ErrorTypes(Enum):
     MISSING_PARAM = "missing parameter"
+    NOT_INT = "must be integer"
 
 def validate_term(req_data):
     errors = {}
+    data_has_year = True
 
     try:
         req_data["term"]
@@ -13,7 +15,14 @@ def validate_term(req_data):
     try:
         req_data["year"]
     except:
-        add_error(errors,ErrorTypes.MISSING_PARAM, "year")
+        data_has_year = False
+        add_error(errors, ErrorTypes.MISSING_PARAM, "year")
+
+    if data_has_year:
+        try:
+            int(req_data["year"])
+        except:
+            add_error(errors, ErrorTypes.NOT_INT, "year")
 
     return create_error_message(errors)
 
@@ -30,12 +39,16 @@ def create_error_message(errors):
             if len(error_list) > 1:
                 error_msg += "missing parameters:"
                 for i in range(len(error_list)):
-                    # Only add a comma if there is more data lefts
+                    # Only add a comma if there is more data left
                     error_msg += " " + error_list[i] + \
                         ("," if (i != len(error_list) - 1) else "")
             elif len(error_list) == 1:
                 error_msg += ErrorTypes.MISSING_PARAM.value + \
                              ": " + error_list[0]
+        elif error_type == ErrorTypes.NOT_INT:
+            error_msg += ErrorTypes.NOT_INT.value + \
+                ": " + error_list[0]
+
     return error_msg
 
 def add_error(errors, error_type, error):

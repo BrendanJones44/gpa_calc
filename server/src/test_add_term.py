@@ -1,8 +1,8 @@
-from server import app
 from flask import url_for
+from server import app
+
 import unittest
 import json
-
 
 class FlaskTodosTest(unittest.TestCase):
     def setUp(self):
@@ -27,7 +27,7 @@ class FlaskTodosTest(unittest.TestCase):
         response says request is missing term param"""
 
         response = self.app.post('/terms/new',
-                                 data=json.dumps({"year":"s"}),
+                                 data=json.dumps({"year":"2015"}),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         resp_data_as_json = json.loads(response.data.decode("utf-8"))
@@ -58,7 +58,7 @@ class FlaskTodosTest(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         resp_data_as_json = json.loads(response.data.decode("utf-8"))
         self.assertEqual(resp_data_as_json["message"],
-                         "the year parameter must be numeric")
+                         "must be integer: year")
 
 
 

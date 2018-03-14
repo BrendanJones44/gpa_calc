@@ -3,7 +3,7 @@ from flask import url_for
 import unittest
 
 
-class FlaskTodosTest(unittest.TestCase):
+class EndPointsTest(unittest.TestCase):
 
     def setUp(self):
         """Set up test application client"""
