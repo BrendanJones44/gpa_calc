@@ -39,7 +39,7 @@ class FlaskTodosTest(unittest.TestCase):
         response says request is missing year param"""
 
         response = self.app.post('/terms/new',
-                                 data=json.dumps({"term": "s"}),
+                                 data=json.dumps({"term": "Fall"}),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         resp_data_as_json = json.loads(response.data.decode("utf-8"))

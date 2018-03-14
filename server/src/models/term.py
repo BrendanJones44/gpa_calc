@@ -1,19 +1,14 @@
 from enum import Enum
+from models.error import Error, ErrorTypes
 
 class SemesterTypes(Enum):
     SPRING = "Spring"
     SUMMER = "Summer"
     FALL = "Fall"
 
-class ErrorTypes(Enum):
-    MISSING_PARAM = "missing parameter"
-    NOT_INT = "must be integer"
-    NOT_SEMESTER = "not a valid semester"
-
 class Term(object):
     def __init__(self, req_data):
         self.errors = {}
-
         data_has_year = True
         data_has_semester = True
 
@@ -21,7 +16,8 @@ class Term(object):
         try:
             semester_type = req_data["term"]
         except:
-            add_error(self.errors, ErrorTypes.MISSING_PARAM, "term")
+            error = Error("term", "term is required")
+            add_error(self.errors, ErrorTypes.MISSING_PARAM, error)
             data_has_semester = False
 
         # Grab the year if it's in the request
@@ -29,7 +25,8 @@ class Term(object):
             year = req_data["year"]
         except:
             data_has_year = False
-            add_error(self.errors, ErrorTypes.MISSING_PARAM, "year")
+            error = Error("year", "year is required")
+            add_error(self.errors, ErrorTypes.MISSING_PARAM, error)
 
         if data_has_year:
 
@@ -37,7 +34,8 @@ class Term(object):
             try:
                 self.year = int(req_data["year"])
             except:
-                add_error(self.errors, ErrorTypes.NOT_INT, "year")
+                error = Error("year", "year must be integer")
+                add_error(self.errors, ErrorTypes.BAD_DATA, error)
 
         if data_has_semester:
 
@@ -45,7 +43,8 @@ class Term(object):
             try:
                 self.semester_type = SemesterTypes(semester_type)
             except:
-                add_error(self.errors, ErrorTypes.NOT_SEMESTER, "term")
+                error = Error("term", "semester not valid")
+                add_error(self.errors, ErrorTypes.BAD_DATA, error)
 
     def error_msg(self):
         error_msg = ""
@@ -58,14 +57,14 @@ class Term(object):
                     for i in range(len(error_list)):
 
                         # Only add a comma if there is more data left
-                        error_msg += " " + error_list[i] + \
+                        error_msg += " " + error_list[i].target + \
                                      ("," if (i != len(error_list) - 1) else "")
                 elif len(error_list) == 1:
                     error_msg += ErrorTypes.MISSING_PARAM.value + \
-                                 ": " + error_list[0]
-            elif error_type == ErrorTypes.NOT_INT:
-                error_msg += ErrorTypes.NOT_INT.value + \
-                             ": " + error_list[0]
+                                 ": " + error_list[0].target
+            elif error_type == ErrorTypes.BAD_DATA:
+                error_msg += ErrorTypes.BAD_DATA.value + \
+                             ": " + error_list[0].target
 
         return error_msg
 

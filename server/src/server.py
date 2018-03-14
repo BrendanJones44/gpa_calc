@@ -21,7 +21,6 @@ def create_term():
     resp_obj = {}
     term = Term(req_data)
 
-
     if term.has_errors():
         resp_obj["message"] = term.error_msg()
         return jsonify(resp_obj), 400
