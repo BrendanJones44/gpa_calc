@@ -11,7 +11,8 @@ class FlaskTodosTest(unittest.TestCase):
         self.app.testing = True
 
     def test_missing_both_params(self):
-        """Assert that requests missing both params say it's missing params"""
+        """Assert that requests missing both params response says
+         request is missing both params"""
 
         response = self.app.post('/terms/new',
                                  data=json.dumps({}),
@@ -21,7 +22,44 @@ class FlaskTodosTest(unittest.TestCase):
         self.assertEqual(resp_data_as_json["message"],
                         "missing parameters: term, year")
 
-    #def test_missing_
+    def test_missing_term_param(self):
+        """Assert that requests missing just the term param
+        response says request is missing term param"""
+
+        response = self.app.post('/terms/new',
+                                 data=json.dumps({"year":"s"}),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        resp_data_as_json = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(resp_data_as_json["message"],
+                         "missing parameter: term")
+
+    def test_missing_year_param(self):
+        """Assert that requests missing just the year param
+        response says request is missing year param"""
+
+        response = self.app.post('/terms/new',
+                                 data=json.dumps({"term": "s"}),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        resp_data_as_json = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(resp_data_as_json["message"],
+                         "missing parameter: year")
+
+    def test_non_numeric_year_param(self):
+        """Assert that requests having the year param be non numeric
+        response says request has non-numeric year param"""
+
+        response = self.app.post('/terms/new',
+                                 data=json.dumps({"year": "s",
+                                                  "term": "s"
+                                                  }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        resp_data_as_json = json.loads(response.data.decode("utf-8"))
+        self.assertEqual(resp_data_as_json["message"],
+                         "the year parameter must be numeric")
+
 
 
 

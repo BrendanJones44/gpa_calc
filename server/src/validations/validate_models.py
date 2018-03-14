@@ -18,16 +18,24 @@ def validate_term(req_data):
     return create_error_message(errors)
 
 def create_error_message(errors):
+    """
+
+
+    :param errors:
+    :return:
+    """
     error_msg = ""
     for error_type, error_list in errors.items():
         if error_type ==  ErrorTypes.MISSING_PARAM:
             if len(error_list) > 1:
                 error_msg += "missing parameters:"
                 for i in range(len(error_list)):
-                    error_msg += " " + error_list[i] + (
-                        "," if (i != len(error_list) - 1) else "")
+                    # Only add a comma if there is more data lefts
+                    error_msg += " " + error_list[i] + \
+                        ("," if (i != len(error_list) - 1) else "")
             elif len(error_list) == 1:
-                error_msg += ErrorTypes.MISSING_PARAM.value + ": " + error_list[0]
+                error_msg += ErrorTypes.MISSING_PARAM.value + \
+                             ": " + error_list[0]
     return error_msg
 
 def add_error(errors, error_type, error):
