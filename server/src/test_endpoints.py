@@ -1,4 +1,4 @@
-from server import app
+from server import APP
 from flask import url_for
 import unittest
 
@@ -7,7 +7,7 @@ class EndPointsTest(unittest.TestCase):
 
     def setUp(self):
         """Set up test application client"""
-        self.app = app.test_client()
+        self.app = APP.test_client()
         self.app.testing = True
 
     def test_home_status_code(self):

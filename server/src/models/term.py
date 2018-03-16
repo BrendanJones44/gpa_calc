@@ -1,86 +1,75 @@
+"""
+Module for the Term model for this application.
+
+Author: Brendan Jones, GitHub: BrendanJones44
+"""
+
 from enum import Enum
 from models.error import Error, ErrorTypes
+from models.base_model import BaseModel
 
 class SemesterTypes(Enum):
+    """
+    SemesterTypes is an Enum of acceptable Strings to represent semesters
+    """
     SPRING = "Spring"
     SUMMER = "Summer"
     FALL = "Fall"
 
-class Term(object):
+class Term(BaseModel):
+    """
+    Term represents the actual term a GPA or a class can belong to
+
+    Term
+    + semester_type : SemesterTypes representing the semester the term is in
+    + year : the year the term was in
+    ----
+    """
     def __init__(self, req_data):
-        self.errors = {}
+        """
+        Create term object from an http request body's req_data.
+        If any errors occur in creating the Term object, they will
+        be attached to the errors dictionary
+
+        :param req_data: the http request body as a dictionary
+        """
+        super().__init__()
+
+        # Initally assume the data has a year and semester,
+        # change to False otherwise.
         data_has_year = True
         data_has_semester = True
 
         # Grab the semester if it's in the request
         try:
             semester_type = req_data["term"]
-        except:
+        except KeyError:
             error = Error("term", "term is required")
-            add_error(self.errors, ErrorTypes.MISSING_PARAM, error)
+            self.add_error(ErrorTypes.MISSING_PARAM, error)
             data_has_semester = False
 
         # Grab the year if it's in the request
         try:
             year = req_data["year"]
-        except:
+        except KeyError:
             data_has_year = False
             error = Error("year", "year is required")
-            add_error(self.errors, ErrorTypes.MISSING_PARAM, error)
+            self.add_error(ErrorTypes.MISSING_PARAM, error)
 
         if data_has_year:
 
             # Make sure the year is an integer
             try:
-                self.year = int(req_data["year"])
-            except:
+                self.year = int(year)
+            except ValueError:
                 error = Error("year", "year must be integer")
-                add_error(self.errors, ErrorTypes.BAD_DATA, error)
+                self.add_error(ErrorTypes.BAD_DATA, error)
 
         if data_has_semester:
 
             # Make sure the semester type is valid
             try:
                 self.semester_type = SemesterTypes(semester_type)
-            except:
+            except ValueError:
                 error = Error("term", "semester not valid")
-                add_error(self.errors, ErrorTypes.BAD_DATA, error)
-
-    def error_msg(self):
-        error_msg = ""
-        for error_type, error_list in self.errors.items():
-            if error_type == ErrorTypes.MISSING_PARAM:
-
-                # Check for plurization
-                if len(error_list) > 1:
-                    error_msg += "missing parameters:"
-                    for i in range(len(error_list)):
-
-                        # Only add a comma if there is more data left
-                        error_msg += " " + error_list[i].target + \
-                                     ("," if (i != len(error_list) - 1) else "")
-                elif len(error_list) == 1:
-                    error_msg += ErrorTypes.MISSING_PARAM.value + \
-                                 ": " + error_list[0].target
-            elif error_type == ErrorTypes.BAD_DATA:
-                error_msg += ErrorTypes.BAD_DATA.value + \
-                             ": " + error_list[0].target
-
-        return error_msg
-
-    def has_errors(self):
-        return len(self.errors) > 0
-
-def add_error(errors, error_type, error):
-    """
-    add_error adds the error to appropriate place in errors hash
-
-    :param errors: the hash of {error_type:[error]} 's
-    :param error_type: the type of error
-    :param error: the error to add
-    :return: none. Adds error to errors
-    """
-    if error_type in errors.keys():
-        errors[error_type].append(error)
-    else:
-        errors[error_type] = [error]
+                self.add_error(ErrorTypes.BAD_DATA, error)

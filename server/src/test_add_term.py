@@ -1,5 +1,5 @@
 from flask import url_for
-from server import app
+from server import APP
 
 import unittest
 import json
@@ -7,7 +7,7 @@ import json
 class FlaskTodosTest(unittest.TestCase):
     def setUp(self):
         """Set up test application client"""
-        self.app = app.test_client()
+        self.app = APP.test_client()
         self.app.testing = True
 
     def test_missing_both_params(self):
