@@ -1,3 +1,4 @@
 flask
 gspread<2.0.0
+gunicorn
 oauth2client
