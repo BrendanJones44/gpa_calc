@@ -22,7 +22,8 @@ def hello():
     :return: the rendered index.html template
     """
     scope = ['https://spreadsheets.google.com/feeds']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        'client_secret.json', scope)
     client = gspread.authorize(creds)
     classes_sheet = client.open('gpa_calc_backend').sheet1
     classes = classes_sheet.get_all_records()
