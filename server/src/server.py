@@ -13,6 +13,11 @@ from models.term import Term
 
 
 APP = Flask(__name__)
+scope = ['https://spreadsheets.google.com/feeds']
+creds = ServiceAccountCredentials.from_json_keyfile_name(
+    'client_secret.json', scope)
+client = gspread.authorize(creds)
+
 
 @APP.route('/')
 def hello():
@@ -21,10 +26,6 @@ def hello():
 
     :return: the rendered index.html template
     """
-    scope = ['https://spreadsheets.google.com/feeds']
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        'client_secret.json', scope)
-    client = gspread.authorize(creds)
     classes_sheet = client.open('gpa_calc_backend').sheet1
     classes = classes_sheet.get_all_records()
     return render_template('index.html', classes=classes)
@@ -46,8 +47,20 @@ def create_term():
         resp_obj["message"] = term.error_msg()
         return jsonify(resp_obj), 400
 
-    return "created", 201
+    else:
+        terms_sheet = client.open('gpa_calc_backend').sheet1
+        terms_sheet.insert_row([term.year, term.semester_type])
+        return "created", 201
+
+@APP.route('/terms/<int:term_id>', methods=['GET'])
+def get_term_by_id():
+    """
+    Get a term from it's id
+
+    :return:
+    """
 
 
 if __name__ == "__main__":
-    APP.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

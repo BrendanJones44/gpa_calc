@@ -4,7 +4,7 @@ from server import APP
 import unittest
 import json
 
-class FlaskTodosTest(unittest.TestCase):
+class AddTermTest(unittest.TestCase):
     def setUp(self):
         """Set up test application client"""
         self.app = APP.test_client()
